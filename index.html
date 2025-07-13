@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
+    />
+    <title>天命隊伍統計</title>
+  </head>
+  <body>
+    <section class="hero is-link is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">天命隊伍統計</h1>
+        </div>
+      </div>
+    </section>
+    <form id="form" class="container m-4 pl-4">
+      <div class="columns">      
+      <div class="column">
+        <label class="label">遊戲名字</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            name="遊戲名字"
+          />
+        </div>
+      </div>
+      <div class="column">
+        <label class="label">遊戲UID</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            name="遊戲UID"
+          />
+        </div>
+        </div>
+      </div>
+<hr>
+
+      <div class="field">
+        <label class="label">你有幾隊主力和器械？</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            name="主力器械"
+            placeholder="範例：2A3B (有兩隊主力及三隊器械）"
+          />
+        </div>
+      </div> 
+
+      <div class="field">
+        <label class="label">請簡述你的主力</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            name="簡述主力"
+            placeholder="範例：中紅虎臣，白板關關張（多於一隊請以逗號分隔）"
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">主力等級</label>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            name="主力等級"
+            placeholder="範例：45/45/45，42/40/40 （多於一隊請以逗號分隔）"
+          />
+        </div>
+      </div>
+
+      <hr>
+      
+      <div class="field">
+        <label class="label">活躍時間</label>
+        <div class="control">
+          <label class="radio">
+            <input type="radio" name="活躍時間" value="大部分時間都能上線" /> 大部分時間都能上線
+          </label>
+          <label class="radio">
+            <input type="radio" name="活躍時間" value="早上可以上線" /> 早上可以上線
+          </label>
+          <label class="radio">
+            <input type="radio" name="活躍時間" value="中午可以上線" /> 中午可以上線
+          </label>
+          <label class="radio">
+            <input type="radio" name="活躍時間" value="晚上可以上線" /> 晚上可以上線
+          </label>
+        </div>
+      </div>
+      
+<hr>
+<div class="notification">
+  你所提交的資料只有<strong>管理層</strong>看得到，並會於季末<strong>燒毁</strong>，謝謝～
+</div>
+
+      <div class="field">
+        <div class="control">
+          <button class="button is-primary" type="submit" id="submit-button" onClick="myFunction()">
+            提交
+          </button>
+        </div>
+      </div>
+    </form>
+    <div
+      id="message"
+      style="
+        display: none;
+        margin: 20px;
+        padding: 10px;
+        border-radius: 4px;
+        font-weight: bold;
+      "
+    ></div>
+
+    <script>
+      const form = document.getElementById("form");
+      const submitButton = document.getElementById("submit-button");
+      const messageDiv = document.getElementById("message");
+      const fileInput = document.getElementById("fileInput");
+      const fileNameDisplay = document.getElementById("fileNameDisplay");
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        messageDiv.textContent = "Submitting...";
+        messageDiv.style.display = "block";
+        messageDiv.style.backgroundColor = "beige";
+        messageDiv.style.color = "black";
+        submitButton.disabled = true;
+        submitButton.classList.add("is-loading");
+
+        try {
+          const formData = new FormData(this);
+          const formDataObj = {};
+
+          // Convert FormData to object
+          for (let [key, value] of formData.entries()) {
+            formDataObj[key] = value;
+          }
+
+          // Submit form data
+          const scriptURL =
+            "https://script.google.com/macros/s/AKfycbyF13veRTuQFn91aP0E5LHQeaszUbVf9uFm1HfayLHA_fLWUqARLPDDMuMbrdfSyep4yw/exec";
+
+          const response = await fetch(scriptURL, {
+            redirect: "follow",
+            method: "POST",
+            body: JSON.stringify(formDataObj),
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8",
+            },
+          });
+
+          const data = await response.json();
+
+          if (data.status === "success") {
+            messageDiv.textContent =
+              data.message || "Data submitted successfully!";
+            messageDiv.style.backgroundColor = "#48c78e";
+            messageDiv.style.color = "white";
+            form.reset();
+          // Redirect after successful submission
+            window.location.href = "thank.html";
+          } else {
+            throw new Error(data.message || "Submission failed");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          messageDiv.textContent = "Error: " + error.message;
+          messageDiv.style.backgroundColor = "#f14668";
+          messageDiv.style.color = "white";
+        } finally {
+          submitButton.disabled = false;
+          submitButton.classList.remove("is-loading");
+
+          setTimeout(() => {
+            messageDiv.textContent = "";
+            messageDiv.style.display = "none";
+          }, 4000);
+        }
+      });
+    </script>
+
+  </body>
+</html>
